@@ -1,0 +1,19 @@
+#flipper{
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vh;
+}
+#flip-Btn{
+    height: fit-content;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+}
+
+#body{
+    transition-duration: 0.5s;
+}
