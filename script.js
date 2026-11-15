@@ -2,6 +2,7 @@ const colorValue = document.getElementById('color-value');
 const flipButton = document.getElementById('flip-Btn');
 
 function flipColor() {
+  document.getElementById('copy-status').textContent = '';
   const channels = Array.from({ length: 3 }, () => Math.floor(Math.random() * 256));
   colorValue.textContent = '#' + channels.map(channel => channel.toString(16).padStart(2, '0')).join('').toUpperCase();
   const linear = channels.map(channel => {
@@ -14,3 +15,19 @@ function flipColor() {
 }
 
 flipButton.addEventListener('click', flipColor);
+
+const copyButton = document.getElementById('copy-Btn');
+const copyStatus = document.getElementById('copy-status');
+
+copyButton.addEventListener('click', async () => {
+  const hex = colorValue.textContent;
+  copyButton.disabled = true;
+  try {
+    await navigator.clipboard.writeText(hex);
+    copyStatus.textContent = `Copied ${hex}.`;
+  } catch {
+    copyStatus.textContent = 'Copy unavailable. Select the hex value above and copy it manually.';
+  } finally {
+    copyButton.disabled = false;
+  }
+});

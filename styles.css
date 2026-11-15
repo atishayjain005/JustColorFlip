@@ -27,3 +27,7 @@ button:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; box-shad
 
 #color-status { margin: 0; font-size: 1.15rem; text-align: center; }
 #color-value { font-family: ui-monospace, monospace; font-weight: 700; }
+
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+#copy-status { min-height: 3em; max-width: 30rem; margin: 0; text-align: center; overflow-wrap: anywhere; }
+button:disabled { cursor: wait; opacity: .8; }

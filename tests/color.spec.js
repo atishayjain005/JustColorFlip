@@ -37,7 +37,32 @@ test('shows the exact generated color and announces updates', async ({ page }) =
   await page.goto('/');
   await expect(page.locator('#color-value')).toHaveText('#FFFFFF');
   await page.getByRole('button', { name: 'Flip color' }).click();
-  await expect(page.getByRole('status')).toHaveText('Current color: #0080FF');
+  await expect(page.locator('#color-status')).toHaveText('Current color: #0080FF');
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 128, 255)');
-  await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+  await expect(page.locator('#color-status')).toHaveAttribute('aria-live', 'polite');
+});
+
+test('copies the current hex value using the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Flip color' }).click();
+  const hex = await page.locator('#color-value').textContent();
+  await page.getByRole('button', { name: 'Copy hex' }).click();
+  await expect(page.locator('#copy-status')).toHaveText('Copied ' + hex + '.');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(hex);
+  await page.getByRole('button', { name: 'Flip color' }).click();
+  await expect(page.locator('#copy-status')).toBeEmpty();
+});
+
+test('recovers when clipboard access is denied', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', { value: {
+      writeText: async () => { throw new Error('Permission denied'); }
+    } });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Copy hex' }).click();
+  await expect(page.locator('#copy-status')).toContainText('copy it manually');
+  await expect(page.getByRole('button', { name: 'Copy hex' })).toBeEnabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
