@@ -1,0 +1,1 @@
+{"name":"just-color-flip","private":true,"scripts":{"check":"node --check script.js","test":"playwright test","start":"python3 -m http.server 4178 --bind 127.0.0.1"},"devDependencies":{"@playwright/test":"1.56.1"}}

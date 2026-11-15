@@ -1,19 +1,8 @@
-console.log("yo");
-
-
-let flip = document.getElementById("flip-btn");
+const flipButton = document.getElementById('flip-Btn');
 
 function flipColor() {
-    let body = document.getElementById("body")
-
-    var x = Math.floor(Math.random() * 256);
-    var y = Math.floor(Math.random() * 256);
-    var z = Math.floor(Math.random() * 256);
-    var bgColor = "rgb(" + x + "," + y + "," + z + ")";
- console.log(bgColor);
-  
-    document.body.style.background = bgColor;
-
-    bgColor = body;
-    
+  const channels = Array.from({ length: 3 }, () => Math.floor(Math.random() * 256));
+  document.body.style.backgroundColor = `rgb(${channels.join(',')})`;
 }
+
+flipButton.addEventListener('click', flipColor);
