@@ -64,5 +64,6 @@ test('recovers when clipboard access is denied', async ({ page }) => {
   await page.getByRole('button', { name: 'Copy hex' }).click();
   await expect(page.locator('#copy-status')).toContainText('copy it manually');
   await expect(page.getByRole('button', { name: 'Copy hex' })).toBeEnabled();
+  await page.screenshot({ path: test.info().outputPath('clipboard-fallback.png') });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
