@@ -13,3 +13,17 @@ test('fits the viewport and flips with a keyboard without external dependencies'
   expect(await page.locator('body').evaluate(el => el.style.backgroundColor)).toMatch(/^rgb\(/);
   expect(errors).toEqual([]);
 });
+
+for (const [name, random, foreground] of [
+  ['black', 0, 'rgb(255, 255, 255)'],
+  ['white', 0.9999, 'rgb(0, 0, 0)'],
+  ['mid-gray', 0.5, 'rgb(0, 0, 0)']
+]) {
+  test('readable heading on ' + name, async ({ page }) => {
+    await page.addInitScript(value => { Math.random = () => value; }, random);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Flip color' }).click();
+    await expect(page.getByRole('heading', { name: 'JustFlip' })).toHaveCSS('color', foreground);
+    await expect(page.getByRole('button', { name: 'Flip color' })).toHaveCSS('color', 'rgb(255, 255, 255)');
+  });
+}
