@@ -22,3 +22,7 @@ No approval requests, deadlines or auto-approvals.
 Each implementation commit passed JavaScript syntax checking, the growing desktop/mobile Playwright suite and diff whitespace checks. Final suite: 14 tests. Runtime has no dependencies; npm audit reports zero vulnerabilities in development dependencies. No separate build/typecheck/lint exists for this static JavaScript app.
 
 Branch: codex/daily-colorflip-accessibility. Production remains the original main version until PR review/merge and Pages verification. No merge or production deployment is claimed by this run.
+
+## CI runner compatibility follow-up
+
+Remote CI exposed an unsupported ubuntu-latest image (Ubuntu 26.04) for Playwright 1.56.1 before tests could start. Proposed improvement: pin the runner to supported Ubuntu 24.04. Reason/impact: restore repeatable browser validation without a tooling migration. Complexity: small. Risk: low. Recommendation: implement. Deployment requirement: none; workflow only. Status: Review / Testing.
