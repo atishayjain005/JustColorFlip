@@ -27,3 +27,17 @@ for (const [name, random, foreground] of [
     await expect(page.getByRole('button', { name: 'Flip color' })).toHaveCSS('color', 'rgb(255, 255, 255)');
   });
 }
+
+test('shows the exact generated color and announces updates', async ({ page }) => {
+  await page.addInitScript(() => {
+    const values = [0, 0.5, 0.9999];
+    let index = 0;
+    Math.random = () => values[index++ % values.length];
+  });
+  await page.goto('/');
+  await expect(page.locator('#color-value')).toHaveText('#FFFFFF');
+  await page.getByRole('button', { name: 'Flip color' }).click();
+  await expect(page.getByRole('status')).toHaveText('Current color: #0080FF');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 128, 255)');
+  await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+});
