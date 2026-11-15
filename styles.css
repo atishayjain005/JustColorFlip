@@ -1,19 +1,33 @@
-#flipper{
-    display: flex;
-    justify-content: center;
-    align-self: center;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vh;
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #ffffff; }
+#flipper {
+  min-height: 100vh;
+  min-height: 100svh;
+  width: 100%;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
 }
-#flip-Btn{
-    height: fit-content;
-    width: fit-content;
-    display: flex;
-    justify-content: center;
-    align-self: center;
+h1 { margin: 0; font-size: clamp(2.5rem, 12vw, 5rem); }
+button {
+  font: inherit;
+  font-weight: 700;
+  background: #171717;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: .5rem;
+  padding: .8rem 1.5rem;
+  min-height: 48px;
+  cursor: pointer;
 }
+button:focus-visible { outline: 3px solid #ffffff; outline-offset: 3px; box-shadow: 0 0 0 7px #171717; }
 
-#body{
-    transition-duration: 0.5s;
-}
+#color-status { margin: 0; font-size: 1.15rem; text-align: center; }
+#color-value { font-family: ui-monospace, monospace; font-weight: 700; }
+
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+#copy-status { min-height: 3em; max-width: 30rem; margin: 0; text-align: center; overflow-wrap: anywhere; }
+button:disabled { cursor: wait; opacity: .8; }

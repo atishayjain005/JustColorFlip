@@ -1,0 +1,69 @@
+const { test, expect } = require('@playwright/test');
+test('fits the viewport and flips with a keyboard without external dependencies', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('https://**/*', route => route.abort());
+  await page.goto('/');
+  await expect(page).toHaveTitle('JustFlip | Random colors');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const button = page.getByRole('button', { name: 'Flip color' });
+  await page.keyboard.press('Tab');
+  await expect(button).toBeFocused();
+  await page.keyboard.press('Enter');
+  expect(await page.locator('body').evaluate(el => el.style.backgroundColor)).toMatch(/^rgb\(/);
+  expect(errors).toEqual([]);
+});
+
+for (const [name, random, foreground] of [
+  ['black', 0, 'rgb(255, 255, 255)'],
+  ['white', 0.9999, 'rgb(0, 0, 0)'],
+  ['mid-gray', 0.5, 'rgb(0, 0, 0)']
+]) {
+  test('readable heading on ' + name, async ({ page }) => {
+    await page.addInitScript(value => { Math.random = () => value; }, random);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Flip color' }).click();
+    await expect(page.getByRole('heading', { name: 'JustFlip' })).toHaveCSS('color', foreground);
+    await expect(page.getByRole('button', { name: 'Flip color' })).toHaveCSS('color', 'rgb(255, 255, 255)');
+  });
+}
+
+test('shows the exact generated color and announces updates', async ({ page }) => {
+  await page.addInitScript(() => {
+    const values = [0, 0.5, 0.9999];
+    let index = 0;
+    Math.random = () => values[index++ % values.length];
+  });
+  await page.goto('/');
+  await expect(page.locator('#color-value')).toHaveText('#FFFFFF');
+  await page.getByRole('button', { name: 'Flip color' }).click();
+  await expect(page.locator('#color-status')).toHaveText('Current color: #0080FF');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(0, 128, 255)');
+  await expect(page.locator('#color-status')).toHaveAttribute('aria-live', 'polite');
+});
+
+test('copies the current hex value using the clipboard', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Flip color' }).click();
+  const hex = await page.locator('#color-value').textContent();
+  await page.getByRole('button', { name: 'Copy hex' }).click();
+  await expect(page.locator('#copy-status')).toHaveText('Copied ' + hex + '.');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(hex);
+  await page.getByRole('button', { name: 'Flip color' }).click();
+  await expect(page.locator('#copy-status')).toBeEmpty();
+});
+
+test('recovers when clipboard access is denied', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', { value: {
+      writeText: async () => { throw new Error('Permission denied'); }
+    } });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Copy hex' }).click();
+  await expect(page.locator('#copy-status')).toContainText('copy it manually');
+  await expect(page.getByRole('button', { name: 'Copy hex' })).toBeEnabled();
+  await page.screenshot({ path: test.info().outputPath('clipboard-fallback.png') });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
